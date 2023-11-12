@@ -18,8 +18,10 @@ def index_page() -> None:
 def index_page() -> None:
     with theme.frame():
         ui.label("Rete")
-        rete.ReteGraph()
+        # ui.button('Add Node', on_click=lambda: rtg.addNode() )
+        with rete.ReteGraph() as rtg:
+            pass
 
 
-ui.run(title='Rete TS Example')
+ui.run(title='Rete Example')
 

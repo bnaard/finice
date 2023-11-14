@@ -16,6 +16,8 @@ export default {
     template: '<div class="retegraph" ref="rete"></div>',
 
     async mounted() {
+        this.$props["ismounted"] = true
+
         this.socket = new window.Rete.ClassicPreset.Socket("socket");
         this.editor = new window.Rete.NodeEditor();
         this.area = new window.ReteAreaPlugin.AreaPlugin(this.$refs.rete);
@@ -36,30 +38,32 @@ export default {
 
         window.ReteAreaPlugin.AreaExtensions.simpleNodesOrder(this.area);
 
-        const x = createNode("X", this.socket); 
-        await this.editor.addNode(x);
-        await this.area.translate(x.id, { x: 320, y: 50 });
+        importGraph(this.editor, this.$props["graph"])
+
+        // const x = createNode("X", this.socket); 
+        // await this.editor.addNode(x);
+        // await this.area.translate(x.id, { x: 320, y: 50 });
 
 
-        const a = new window.Rete.ClassicPreset.Node("A");
-        a.addControl(
-            "a",
-            new window.Rete.ClassicPreset.InputControl("text", { initial: "hello" })
-        );
-        a.addOutput("a", new window.Rete.ClassicPreset.Output(this.socket));
-        await this.editor.addNode(a);
+        // const a = new window.Rete.ClassicPreset.Node("A");
+        // a.addControl(
+        //     "a",
+        //     new window.Rete.ClassicPreset.InputControl("text", { initial: "hello" })
+        // );
+        // a.addOutput("a", new window.Rete.ClassicPreset.Output(this.socket));
+        // await this.editor.addNode(a);
 
-        const b = new window.Rete.ClassicPreset.Node("B");
-        b.addControl(
-            "b",
-            new window.Rete.ClassicPreset.InputControl("text", { initial: "hello" })
-        );
-        b.addInput("b", new window.Rete.ClassicPreset.Input(this.socket));
-        await this.editor.addNode(b);
+        // const b = new window.Rete.ClassicPreset.Node("B");
+        // b.addControl(
+        //     "b",
+        //     new window.Rete.ClassicPreset.InputControl("text", { initial: "hello" })
+        // );
+        // b.addInput("b", new window.Rete.ClassicPreset.Input(this.socket));
+        // await this.editor.addNode(b);
 
-        await this.area.translate(b.id, { x: 420, y: 100 });
+        // await this.area.translate(b.id, { x: 420, y: 100 });
 
-        await this.editor.addConnection(new window.Rete.ClassicPreset.Connection(a, "a", b, "b"));
+        // await this.editor.addConnection(new window.Rete.ClassicPreset.Connection(a, "a", b, "b"));
 
         window.ReteAreaPlugin.AreaExtensions.zoomAt(this.area, this.editor.getNodes());
 
@@ -71,9 +75,14 @@ export default {
         this.area.destroy();
     },
     props: {
-        graph: Object
+        graph: Object, 
+        ismounted: Boolean
     },
     methods: {
+        // isMounted() {
+        //     return this.ismounted || false
+        // },
+        
         update_chart() {
             //   convertDynamicProperties(this.options, true);
             //   this.chart.setOption(this.options);

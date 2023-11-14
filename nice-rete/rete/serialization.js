@@ -61,27 +61,35 @@ export function deserializeNode(data) {
     const { id, label, inputs, outputs, controls } = data;
     const node = new window.Rete.ClassicPreset.Node(label);
 
+    console.log(data)
+    console.log(id, label)
     node.id = id;
 
-    Object.entries(inputs).forEach(([key, input]) => {
-        const socket = new window.Rete.ClassicPreset.Socket(input.socket.name);
-        const inp = new window.Rete.ClassicPreset.Input(socket, input.label);
+    if (inputs != null && Object.keys(inputs).length > 0) { 
+        Object.entries(inputs).forEach(([key, input]) => {
+            const socket = new window.Rete.ClassicPreset.Socket(input.socket.name);
+            const inp = new window.Rete.ClassicPreset.Input(socket, input.label);
 
-        inp.id = input.id;
+            inp.id = input.id;
 
-        node.addInput(key, input);
-    });
-    Object.entries(outputs).forEach(([key, output]) => {
-        const socket = new window.Rete.ClassicPreset.Socket(output.socket.name);
-        const out = new window.Rete.ClassicPreset.Output(socket, output.label);
+            node.addInput(key, input);
+        });
+    }
 
-        out.id = output.id;
+    if (outputs != null && Object.keys(outputs).length > 0) {
+        Object.entries(outputs).forEach(([key, output]) => {
+            const socket = new window.Rete.ClassicPreset.Socket(output.socket.name);
+            const out = new window.Rete.ClassicPreset.Output(socket, output.label);
 
-        node.addOutput(key, out);
-    });
-    Object.entries(controls).forEach(
-        ([key, control]) => {
-            if (!control) return;
+            out.id = output.id;
+
+            node.addOutput(key, out);
+        });
+    }
+
+    if (controls != null && Object.keys(controls).length > 0) {
+        Object.entries(controls).forEach(([key, control]) => {
+            // if (!control) return;
 
             if (control.__type === "ClassicPreset.InputControl") {
                 const ctrl = new window.Rete.ClassicPreset.InputControl(control.type, {
@@ -90,15 +98,16 @@ export function deserializeNode(data) {
                 });
                 node.addControl(key, ctrl);
             }
-        }
-    );
+        });
+    }
 
     return node
 }
 
 export async function importGraph(editor, data) {
-    for (const { id, label, inputs, outputs, controls } of data.nodes) {
-        node = deserializeNode(editor, { id, label, inputs, outputs, controls } )
+    for (const nodedata of data.nodes) {
+        // { id, label, inputs, outputs, controls } = anode
+        var node = deserializeNode(nodedata )
         await editor.addNode(node);
     }
 }

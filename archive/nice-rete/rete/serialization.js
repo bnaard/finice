@@ -26,7 +26,7 @@ function serializeClassicPresetInputControl(control) {
     };
 }
 
-
+// TODO Change data structure
 export async function exportGraph(editor) {
     const data = { nodes: [] };
     const nodes = editor.getNodes();
@@ -57,46 +57,44 @@ export async function exportGraph(editor) {
 }
 
 
-export function deserializeNode(data) {
-    const { id, label, inputs, outputs, controls } = data;
+export function deserializeNode(node_id, data) {
+    const { label, inputs, outputs, controls } = data;
     const node = new window.Rete.ClassicPreset.Node(label);
 
     console.log(data)
-    console.log(id, label)
-    node.id = id;
+    console.log(node_id, label)
+    node.id = node_id;
 
     if (inputs != null && Object.keys(inputs).length > 0) { 
-        Object.entries(inputs).forEach(([key, input]) => {
-            const socket = new window.Rete.ClassicPreset.Socket(input.socket.name);
-            const inp = new window.Rete.ClassicPreset.Input(socket, input.label);
+        Object.entries(inputs).forEach(([input_id, input_data]) => {
+            const socket = new window.Rete.ClassicPreset.Socket(input_data.socket.name);
+            const inp = new window.Rete.ClassicPreset.Input(socket, input_data.label);
 
-            inp.id = input.id;
+            inp.id = input_id;
 
-            node.addInput(key, input);
+            node.addInput("port", inp);
         });
     }
 
-    if (outputs != null && Object.keys(outputs).length > 0) {
-        Object.entries(outputs).forEach(([key, output]) => {
-            const socket = new window.Rete.ClassicPreset.Socket(output.socket.name);
-            const out = new window.Rete.ClassicPreset.Output(socket, output.label);
+    if (outputs != null && Object.keys(outputs).length > 0) { 
+        Object.entries(outputs).forEach(([output_id, output_data]) => {
+            const socket = new window.Rete.ClassicPreset.Socket(output_data.socket.name);
+            const outp = new window.Rete.ClassicPreset.Output(socket, output_data.label);
 
-            out.id = output.id;
+            outp.id = output_id;
 
-            node.addOutput(key, out);
+            node.addOutput("port", outp);
         });
     }
 
     if (controls != null && Object.keys(controls).length > 0) {
-        Object.entries(controls).forEach(([key, control]) => {
-            // if (!control) return;
-
-            if (control.__type === "ClassicPreset.InputControl") {
-                const ctrl = new window.Rete.ClassicPreset.InputControl(control.type, {
-                    initial: control.value,
-                    readonly: control.readonly
+        Object.entries(controls).forEach(([control_id, control_data]) => {
+            if (control_data.control_type === "INPUT") {
+                const ctrl = new window.Rete.ClassicPreset.InputControl(control_data._input_type, {
+                    initial: control_data.value,
+                    readonly: control_data.readonly
                 });
-                node.addControl(key, ctrl);
+                node.addControl("control", ctrl);
             }
         });
     }
@@ -104,10 +102,14 @@ export function deserializeNode(data) {
     return node
 }
 
+
+async function importNode(editor, node_id, node_data) {
+    var node = deserializeNode(node_id, node_data)
+    await editor.addNode(node);
+}
+
 export async function importGraph(editor, data) {
-    for (const nodedata of data.nodes) {
-        // { id, label, inputs, outputs, controls } = anode
-        var node = deserializeNode(nodedata )
-        await editor.addNode(node);
-    }
+    Object.entries(data.nodes).forEach(([node_id, node_data]) => {
+        importNode(editor, node_id, node_data);
+    });
 }

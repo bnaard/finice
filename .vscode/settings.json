@@ -11,5 +11,8 @@
         "--line-length",
         "120"
     ],
-    "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
+    "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix",
+    "cSpell.words": [
+        "nicegui"
+    ]
 }

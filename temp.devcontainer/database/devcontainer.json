@@ -1,0 +1,7 @@
+{
+	"name": "Dolt Database",
+    "dockerComposeFile": ["../../docker-compose.yaml"],
+    "service": "database",
+    "shutdownAction": "stopCompose",
+    "workspaceFolder": "/workspace"
+}

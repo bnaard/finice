@@ -7,13 +7,12 @@
 
 
 	"features": {
-		// "ghcr.io/devcontainers-contrib/features/black:2": {},
-		// "ghcr.io/devcontainers-contrib/features/flake8:2": {},
-		"ghcr.io/devcontainers-contrib/features/ruff:1": {},
-		// "ghcr.io/devcontainers-contrib/features/pipx-package:1": {},
-		"ghcr.io/devcontainers-contrib/features/poetry:2": {}
-		// "ghcr.io/devcontainers-contrib/features/pylint:2": {},
-		// "ghcr.io/devcontainers/features/node:1": {}
+		"ghcr.io/devcontainers-contrib/features/black:2": {},
+		"ghcr.io/devcontainers-contrib/features/flake8:2": {},
+		"ghcr.io/devcontainers-contrib/features/pipx-package:1": {},
+		"ghcr.io/devcontainers-contrib/features/poetry:2": {},
+		"ghcr.io/devcontainers-contrib/features/pylint:2": {},
+		"ghcr.io/devcontainers/features/node:1": {}
 	},
 
 	"customizations": {
@@ -25,7 +24,8 @@
 				"redhat.vscode-yaml",
 				"bierner.markdown-mermaid",
 				"gruntfuggly.todo-tree",
-				"charliermarsh.ruff",
+				"ms-python.black-formatter",
+				"ms-python.autopep8",
 				"stkb.rewrap",
 				// "github.copilot",
 				// "github.copilot-chat",

@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  backend:
+    build: 
+      dockerfile: ./.devcontainer/backend.dev.Dockerfile        
+    container_name: nicegui-backend-dev
+    # restart: always
+    ports:
+      - 8080:8080
+    # volumes:
+    #   - .:/workspace:cached  # mount our local folder to the dev container as its workspace folder

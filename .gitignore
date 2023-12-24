@@ -1,5 +1,8 @@
 nicegui-main
 
+# exclude development database data directory content
+data/*
+
 # poetry related
 poetry.lock
 

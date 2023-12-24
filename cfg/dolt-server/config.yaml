@@ -1,0 +1,11 @@
+behavior:
+  autocommit: true
+  event_scheduler: "ON"
+
+cfg_dir: .doltcfg
+
+privilege_file: .doltcfg/privileges.db
+
+branch_control_file: .doltcfg/branch_control.db
+
+user_session_vars: []

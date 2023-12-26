@@ -4,3 +4,5 @@ https://docs.dolthub.com/introduction/installation/docker
 
 https://dev.to/cmiles74/really-using-visual-studio-development-containers-561e
 
+https://piethein.medium.com/dockerize-your-projects-in-visual-studio-code-f2374de541bd
+

@@ -1,0 +1,1 @@
+[{"connectionUrl":"mysql://root:xyz123@database:3306/","hideDoltFeatures":false,"useSSL":false,"type":"mysql","name":"finice"}]

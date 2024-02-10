@@ -8,6 +8,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"ms-python.python",
 				"eamodio.gitlens",
 				"tamasfe.even-better-toml",
 				"davidanson.vscode-markdownlint",
@@ -20,7 +21,8 @@
 				// "github.copilot-chat",
 				// "github.copilot-labs",
 				"anseki.vscode-color",
-				"vue.volar"
+				"vue.volar",
+				"chouzz.vscode-better-align"
 			]
 		}
 	},

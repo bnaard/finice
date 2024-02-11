@@ -39,13 +39,13 @@ services:
     networks:
       - backend
       - database
-    environment:
-      - DOLT_HOST=${DATABASE_HOST}
-      - DOLT_PORT=${DATABASE_PORT}
-      - DOLT_USER=${DATABASE_USER}
-      - DOLT_PASSWORD=${DATABASE_PASSWORD}
-      - DOLT_TIMEOUT=${DATABASE_TIMEOUT}
-      - DOLT_LOGLEVEL=${DATABASE_LOGLEVEL}
+    # environment:
+    #   - DOLT_HOST=${DATABASE_HOST}
+    #   - DOLT_PORT=${DATABASE_PORT}
+    #   - DOLT_USER=${DATABASE_USER}
+    #   - DOLT_PASSWORD=${DATABASE_PASSWORD}
+    #   - DOLT_TIMEOUT=${DATABASE_TIMEOUT}
+    #   - DOLT_LOGLEVEL=${DATABASE_LOGLEVEL}
     command: dolt sql-server --host=${DATABASE_HOST} --port=${DATABASE_PORT} --user=${DATABASE_USER} --password=${DATABASE_PASSWORD} --timeout=${DATABASE_TIMEOUT} --loglevel=${DATABASE_LOGLEVEL}
 
   workbench:

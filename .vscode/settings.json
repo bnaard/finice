@@ -17,5 +17,8 @@
     "cSpell.words": [
         "nicegui"
     ],
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
 
 }

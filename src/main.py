@@ -1,5 +1,5 @@
-from nicegui import Tailwind, ui
+from nicegui import ui
 
-import pages.index
+import pages.index  # noqa: F401
 
 ui.run(title="Nice Data")

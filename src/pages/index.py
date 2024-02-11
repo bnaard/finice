@@ -1,9 +1,8 @@
-from nicegui import Tailwind, ui
+from nicegui import ui
 
-import theme.theme as theme
+from theme import Frame
 
-# here we use our custom page decorator directly and just put the content creation into a separate function
 @ui.page('/')
 def index_page() -> None:
-    with theme.frame():
+    with Frame():
         ui.label("Homepage")

@@ -1,6 +1,6 @@
 from nicegui import Tailwind, ui
 
-import theme
+import theme.theme as theme
 
 # here we use our custom page decorator directly and just put the content creation into a separate function
 @ui.page('/')

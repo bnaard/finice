@@ -3,6 +3,9 @@ nicegui-main
 # exclude development database data directory content
 data/*
 
+realm/*
+cfg/dolt-workbench/*
+
 # poetry related
 poetry.lock
 

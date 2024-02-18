@@ -1,60 +1,155 @@
 version: "3"
 
 networks:
-  backend:
+  backend_net:
     ipam:
       driver: default
       config:
         - subnet: "192.168.0.1/24"
-  database:
+  database_net:
     ipam:
       driver: default
       config:
         - subnet: "192.168.1.1/24"
+  traefik_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.2.1/24"
 
 services:
-  backend:
-    container_name: nicegui-backend
-    build:
-      context: .
-      dockerfile: backend.prod.Dockerfile
+  traefik:
+    image: ${TRAEFIK_IMAGE_TAG}
+    command:
+      - "--log.level=${TRAEFIK_LOG_LEVEL}"
+      - "--accesslog=true"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--ping=true"
+      - "--ping.entrypoint=ping"
+      - "--entryPoints.ping.address=${TRAEFIK_PING_ADDRESS}:${TRAEFIK_PING_PORT}"
+      - "--entryPoints.web.address=${TRAEFIK_WEB_ADDRESS}:${TRAEFIK_WEB_PORT}"
+      - "--entryPoints.websecure.address=${TRAEFIK_WEB_SECURE_ADDRESS}:${TRAEFIK_WEB_SECURE_PORT}"
+      - "--providers.docker=true"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.exposedByDefault=false"
+      # - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      # - "--certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_ACME_EMAIL}"
+      # - "--certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme/acme.json"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
+      - "--global.checkNewVersion=true"
+      - "--global.sendAnonymousUsage=false"
     volumes:
-      - ..:/workspace:cached
-    command: sleep infinity
-    ports:
-      - 8080:8080
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../cfg/traefik-certificates:/etc/traefik/acme
+    # If the following is not defined, traefik cannot connect to docker.sock
+    # "Got permission denied while trying to connect to the Docker daemon socket"
+    # Ref: https://www.reddit.com/r/docker/comments/15cw6w3/how_to_disable_se_linux_from_docker_compose/
+    security_opt:
+      - label=disable 
     networks:
-      - backend
-    user: vscode
+      - traefik_net
+    ports:
+      - ${EXPOSE_PORT_TRAEFIK}:${TRAEFIK_WEB_PORT}
+      - ${EXPOSE_PORT_TRAEFIK_SECURE}:${TRAEFIK_WEB_SECURE_PORT}
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "http://localhost:${TRAEFIK_PING_PORT}/ping","--spider"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_HOSTNAME}`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.services.dashboard.loadbalancer.passhostheader=true"
+      - "traefik.http.routers.dashboard.middlewares=authtraefik"
+      - "traefik.http.middlewares.authtraefik.basicauth.users=${TRAEFIK_BASIC_AUTH}"
+      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    restart: unless-stopped
 
-  database:
-    image: dolthub/dolt-sql-server
-    container_name: dolt-server
-    volumes:
-      - ../data:/var/lib/dolt/                       # data directory mapping
-      # - ../cfg/dolt-server:/etc/dolt/servercfg.d     # server configuration file mapping
-      - ../cfg/dolt:/etc/dolt/doltcfg.d              # global dolt configuration mapping
-    ports:
-      - 3307:${DATABASE_PORT}
-    networks:
-      - backend
-      - database
-    # environment:
-    #   - DOLT_HOST=${DATABASE_HOST}
-    #   - DOLT_PORT=${DATABASE_PORT}
-    #   - DOLT_USER=${DATABASE_USER}
-    #   - DOLT_PASSWORD=${DATABASE_PASSWORD}
-    #   - DOLT_TIMEOUT=${DATABASE_TIMEOUT}
-    #   - DOLT_LOGLEVEL=${DATABASE_LOGLEVEL}
-    command: dolt sql-server --host=${DATABASE_HOST} --port=${DATABASE_PORT} --user=${DATABASE_USER} --password=${DATABASE_PASSWORD} --timeout=${DATABASE_TIMEOUT} --loglevel=${DATABASE_LOGLEVEL}
 
-  workbench:
-    image: dolthub/dolt-workbench
-    container_name: dolt-workbench
-    volumes:
-      - ../cfg/dolt-workbench:/app/graphql-server/store
-    ports:
-      - 9002:9002
-      - 3000:3000
-    networks:
-      - database
+
+  # backend:
+  #   container_name: nicegui-backend
+  #   build:
+  #     context: .
+  #     dockerfile: backend.dev.Dockerfile
+  #   volumes:
+  #     - ..:/workspace:cached
+  #   command: sleep infinity
+  #   ports:
+  #     - ${EXPOSE_PORT_BACKEND}:8080
+  #   networks:
+  #     - backend_net
+  #   user: vscode
+
+  # database:
+  #   image: dolthub/dolt-sql-server
+  #   container_name: dolt-server
+  #   volumes:
+  #     - ../data:/var/lib/dolt/                       # data directory mapping
+  #     # - ../cfg/dolt-server:/etc/dolt/servercfg.d     # server configuration file mapping
+  #     - ../cfg/dolt:/etc/dolt/doltcfg.d              # global dolt configuration mapping
+  #   # ports:
+  #   #   - ${EXPOSE_PORT_DATABASE}:${DATABASE_PORT}
+  #   networks:
+  #     - backend_net
+  #     - database_net
+  #   # environment:
+  #   #   - DOLT_HOST=${DATABASE_HOST}
+  #   #   - DOLT_PORT=${DATABASE_PORT}
+  #   #   - DOLT_USER=${DATABASE_USER}
+  #   #   - DOLT_PASSWORD=${DATABASE_PASSWORD}
+  #   #   - DOLT_TIMEOUT=${DATABASE_TIMEOUT}
+  #   #   - DOLT_LOGLEVEL=${DATABASE_LOGLEVEL}
+  #   command: dolt sql-server --host=${DATABASE_HOST} --port=${DATABASE_PORT} --user=${DATABASE_USER} --password=${DATABASE_PASSWORD} --timeout=${DATABASE_TIMEOUT} --loglevel=${DATABASE_LOGLEVEL}
+
+  # workbench:
+  #   image: dolthub/dolt-workbench
+  #   container_name: dolt-workbench
+  #   depends_on: 
+  #     - database
+  #   volumes:
+  #     - ../cfg/dolt-workbench:/app/graphql-server/store
+  #   ports:
+  #     - 9002:9002
+  #     - ${EXPOSE_PORT_WORKBENCH_UI}:3000
+  #   networks:
+  #     - database_net
+
+  # iam:
+  #   container_name: keycloak
+  #   build:
+  #     context: .
+  #     dockerfile: keycloak.dev.Dockerfile
+  #   depends_on: 
+  #     - database
+  #   environment:
+  #     - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+  #     - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+  #     - KC_DB_URL=http://database:${EXPOSE_PORT_DATABASE}
+  #     - KC_DB_USERNAME=${DATABASE_USER}
+  #     - KC_DB_PASSWORD=${DATABASE_PASSWORD}
+  #     - ENV KC_DB=mysql
+  #     - ENV KC_HOSTNAME=iam
+  #     - DB_VENDOR=postgres
+  #     - DB_ADDR=postgres
+
+  #   volumes:
+  #     - ../realm:/opt/keycloak/data/import
+  #   command: start-dev --import-realm
+  #   ports:
+  #     - ${EXPOSE_PORT_KEYCLOAK}:8080
+  #   networks:
+  #     - database_net
+  #     - backend_net

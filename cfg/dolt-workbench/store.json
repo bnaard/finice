@@ -1,1 +1,1 @@
-[{"connectionUrl":"mysql://root:xyz123@database:3306/","hideDoltFeatures":false,"useSSL":false,"type":"mysql","name":"finice"}]
+[{"connectionUrl":"mysql://root:@dolt-server:3306/","hideDoltFeatures":false,"useSSL":true,"type":"mysql","name":"DOlt"}]

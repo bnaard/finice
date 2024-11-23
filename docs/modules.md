@@ -1,1 +1,1 @@
-::: finice.foo
+::: app.startup

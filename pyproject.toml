@@ -17,6 +17,9 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+dependencies = [
+    "nicegui>=2.7.0",
+]
 
 [project.urls]
 Homepage = "https://bnaard.github.io/finice/"
@@ -29,12 +32,13 @@ dev-dependencies = [
     "pre-commit>=2.20.0",
     "tox-uv>=1.11.3",
     "deptry>=0.20.0",
-    "mypy>=0.991",
     "pytest-cov>=4.0.0",
     "ruff>=0.6.9",
     "mkdocs>=1.4.2",
     "mkdocs-material>=8.5.10",
     "mkdocstrings[python]>=0.26.1",
+    "mypy>=1.13.0",
+    "pytest-asyncio>=0.24.0",
 ]
 
 [build-system]
@@ -42,10 +46,10 @@ requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["finice"]
+py-modules = ["app"]
 
 [tool.mypy]
-files = ["finice"]
+files = ["app"]
 disallow_untyped_defs = true
 disallow_any_unimported = true
 no_implicit_optional = true
@@ -56,6 +60,8 @@ show_error_codes = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+asyncio_mode = "auto"
+
 
 [tool.ruff]
 target-version = "py39"
@@ -113,4 +119,4 @@ skip_empty = true
 
 [tool.coverage.run]
 branch = true
-source = ["finice"]
+source = ["app"]

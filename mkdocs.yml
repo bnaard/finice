@@ -10,16 +10,21 @@ copyright: Maintained by <a href="https://bnaard.com">bnaard</a>.
 nav:
   - Home: index.md
   - Modules: modules.md
+  - Development Environment: devenv.md
 plugins:
   - search
   - mkdocstrings:
       handlers:
         python:
-          paths: [finice]
+          paths: [app]
 theme:
   name: material
   feature:
     tabs: true
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -37,7 +42,7 @@ theme:
         name: Switch to light mode
   icon:
     repo: fontawesome/brands/github
-
+  logo: assets/refinice_logo.svg
 extra:
   social:
     - icon: fontawesome/brands/github
@@ -50,3 +55,12 @@ markdown_extensions:
       permalink: true
   - pymdownx.arithmatex:
       generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
